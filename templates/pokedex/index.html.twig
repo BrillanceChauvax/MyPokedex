@@ -1,0 +1,392 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        background-color: #a6c0f8ff;
+    }
+    table.pokedex {
+        width: 100%;
+        background-color: #a6c0f8ff;
+    }
+    table.pokedex th, table.pokedex td {
+        border: 2.5px solid #444;
+        text-align: center;
+        vertical-align: middle;
+        height: 40px; 
+        position: relative;
+    }
+    table.pokedex th {
+        background-color: #a7dffdff;
+        font-weight: bold;
+    }
+    .type-cell {
+        min-width: 60px;
+    }
+    .type-column-inner {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        height: 100%;
+        justify-content: center;
+    }
+    .pokemon-image {
+        display: flex;
+        align-items: center;   
+        justify-content: center; 
+        width: 100%;
+        max-width: 100px;
+        height: 200px;
+        object-fit: contain;
+        margin: 0 auto;
+    }
+    img.type-icon {
+        width: 100%;
+        height: 80px;
+        max-width: 100px;
+        object-fit: contain;
+        display: block;
+        margin: 2px auto;
+    }
+    .evolution-cell {
+        min-width: 120px;
+        padding: 8px;
+    }
+    .evolution-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+    }
+    .evolution-sprite {
+        width: 50px;
+        height: 50px;
+        object-fit: contain;
+    }
+    .evolution-condition {
+        font-size: 0.8em;
+        color: #333;
+        text-align: center;
+        line-height: 1.2;
+    }
+    .navbar-pokedex {
+        width: 100%;
+        background: linear-gradient(90deg, #2381c9 0%, #a7dffdff 100%);
+        position: sticky;
+        top: 0;
+        margin: 0;
+        padding: 0.8em 1em;
+        box-sizing: border-box;
+        z-index: 30;
+    }
+    .pagination-container {
+        margin: 1em auto;
+        text-align: center;
+        background: linear-gradient(90deg, #2381c9 0%, #a7dffdff 100%);
+        padding: 1.5em;
+        border-radius: 8px;
+        max-width: 800px;
+    }
+
+    .limit-selector {
+        margin-bottom: 1em;
+    }
+
+    .limit-selector label {
+        color: white;
+        font-weight: bold;
+        margin-right: 0.5em;
+    }
+
+    .limit-selector select {
+        border-radius: 7px;
+        border: 1px solid #4697ec;
+        padding: 5px 8px;
+        background: #fff;
+        color: #234;
+        font-size: 1em;
+    }
+
+    .pagination-info {
+        color: white;
+        margin-bottom: 1em;
+        font-size: 0.9em;
+    }
+
+    .pagination-nav a, .pagination-nav span {
+        display: inline-block;
+        padding: 8px 12px;
+        margin: 4px 4px;
+        border-radius: 5px;
+        text-decoration: none;
+        color: white;
+        background: rgba(255,255,255,0.2);
+        border: 1px solid rgba(255,255,255,0.3);
+    }
+
+    .pagination-nav a:hover {
+        background: rgba(255,255,255,0.3);
+    }
+
+    .pagination-nav .current {
+        background: #db3133;
+        font-weight: bold;
+    }
+
+    .pagination-nav .disabled {
+        opacity: 0.5;
+        pointer-events: none;
+    }
+    @media (min-width: 901px) {
+        .navbar-pokedex {
+            display: flex;
+            align-items: center;
+            gap: 2em;
+        }
+        .navbar-top {
+            display: contents; 
+        }
+        .logo-pokedex {
+            height: 46px;
+            width: auto;
+            margin-left: 0.4em;
+        }
+        .form-pokedex-filters {
+            display: flex;
+            align-items: center;
+            gap: 1.2em;
+            flex: 1;
+        }
+        .mobile-toggle {
+            display: none;
+        }
+    }
+    @media (max-width: 900px) {
+        .navbar-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1em;
+        }
+        .logo-pokedex {
+            height: 46px;
+            width: auto;
+            margin-left: 0.4em;
+        }
+        .form-pokedex-filters {
+            flex-direction: column;
+            max-height: 0;
+            overflow: hidden;
+            padding-top: 0;
+            margin-top: 0;
+            width: 100%;
+            display: flex;
+            gap: 0.8em;
+            transition: max-height 0.4s ease, padding 0.3s ease;
+        }
+        .navbar-pokedex.show-filters .form-pokedex-filters {
+            max-height: 1000px;
+            padding-top: 1em;
+        }
+        .form-pokedex-filters > * {
+            width: 100%;
+        }
+        .mobile-toggle {
+            display: block;
+            color: white;
+            font-weight: bold;
+            border: 1px solid #fff;
+            background: transparent;
+            padding: 0.4em 0.8em;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+    }
+    .form-pokedex-filters select,
+    .form-pokedex-filters input {
+        border-radius: 7px;
+        border: 1px solid #4697ec;
+        padding: 5px 8px;
+        background: #fff;
+        color: #234;
+        font-size: 1em;
+        min-width: 90px;
+    }
+    .form-pokedex-filters button {
+        border: 1px solid #c00;
+        color: #fff;
+        background: #db3133;
+        font-weight: 600;
+        border-radius: 7px;
+        padding: 6px 13px;
+        cursor: pointer;
+        transition: background 0.18s;
+        min-width: 92px;
+    }
+    .form-pokedex-filters button:hover { 
+        background: #ba2225; 
+    }
+    @media (max-width: 520px) {
+        .logo-pokedex { 
+            height: 34px; 
+        }
+        
+        .form-pokedex-filters select,
+        .form-pokedex-filters input,
+        .form-pokedex-filters button { 
+            font-size: 0.93em; 
+        }
+    }
+</style>
+
+<nav class="navbar-pokedex">
+    <div class="navbar-top">
+        <img
+            src="{{ asset('logo-pokedex.png') }}"
+            class="logo-pokedex"
+            alt="Pokédex logo"
+        >
+        
+        <button 
+            class="mobile-toggle" 
+            type="button" 
+            onclick="document.querySelector('.navbar-pokedex').classList.toggle('show-filters')">
+            ☰ Menu
+        </button>
+    </div>
+
+    <form method="get" class="form-pokedex-filters">
+        <select name="generation" onchange="this.form.submit()">
+            <option value="">Toutes générations</option>
+            {% for gen in generations %}
+                <option value="{{ gen }}" {% if gen == current_generation %}selected{% endif %}>Génération {{ gen }}</option>
+            {% endfor %}
+        </select>
+        
+        <select name="type" onchange="this.form.submit()">
+            <option value="">Tous types</option>
+            {% for t in types %}
+                <option value="{{ t.id }}" {% if t.id == current_type %}selected{% endif %}>{{ t.nom }}</option>
+            {% endfor %}
+        </select>
+        
+        <input type="text" name="q" placeholder="Nom ou numéro..." value="{{ current_search }}">
+        <button type="submit">Rechercher</button>
+        <button type="button" onclick="window.location='{{ path('pokedex') }}'">Réinitialiser</button>
+    </form>
+</nav>
+
+<table class="pokedex">
+    <thead>
+        <tr>
+            <th>Génération</th>
+            <th>N°</th>
+            <th>Image</th>
+            <th>Nom</th>
+            <th>Types</th>
+            <th>Évolution</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for p in pokemons %}
+            <tr>
+                <td>{{ p.generation }}</td>
+                <td>{{ p.numeroNational }}</td>
+                <td>
+                    <img
+                        src="{{ p.imageUrl }}"
+                        alt="{{ p.nom }}"
+                        class="pokemon-image"
+                        onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/0.png';"
+                    >
+                </td>
+                <td>{{ p.nom }}</td>
+                <td class="type-cell">
+                    <span class="type-column-inner">
+                    {% for pt in p.types %}
+                        <img src="{{ pt.type.iconeUrl }}" alt="{{ pt.type.nom }}" title="{{ pt.type.nom }}" class="type-icon">
+                    {% endfor %}
+                    </span>
+                </td>
+                <td class="evolution-cell">
+                    {% set evolutions = p.evolutionsDepuis|default([]) %}
+                    {% if evolutions|length > 0 %}
+                        {% for ev in evolutions %}
+                            <div class="evolution-content">
+                                <img 
+                                    src="{{ ev.pokemonFin.imageUrl }}" 
+                                    alt="{{ ev.pokemonFin.nom }}" 
+                                    class="evolution-sprite"
+                                    onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/0.png';"
+                                >
+                                <div class="evolution-name">{{ ev.pokemonFin.nom }}</div>
+                                <div class="evolution-condition">{{ ev.condition }}</div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        ✖
+                    {% endif %}
+                </td>
+            </tr>
+        {% else %}
+            <tr><td colspan="6">Aucun résultat</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<div class="pagination-container">
+    <div class="limit-selector">
+        <label for="limit-select">Afficher :</label>
+        <select id="limit-select" onchange="changeLimit(this.value)">
+            <option value="25" {% if current_limit == 25 %}selected{% endif %}>25 par page</option>
+            <option value="50" {% if current_limit == 50 %}selected{% endif %}>50 par page</option>
+            <option value="75" {% if current_limit == 75 %}selected{% endif %}>75 par page</option>
+            <option value="100" {% if current_limit == 100 %}selected{% endif %}>100 par page</option>
+            <option value="all" {% if current_limit == 'all' %}selected{% endif %}>Tous</option>
+        </select>
+    </div>
+
+    {% if current_limit != 'all' %}
+        <div class="pagination-info">
+            Affichage de {{ ((currentPage - 1) * current_limit + 1) }} à {{ min(currentPage * current_limit, totalPokemons) }} sur {{ totalPokemons }} Pokémon
+        </div>
+
+        {% if totalPages > 1 %}
+            <div class="pagination-nav">
+                {% if currentPage > 1 %}
+                    <a href="{{ path('pokedex', {generation: current_generation, type: current_type, q: current_search, limit: current_limit, page: 1}) }}">« Première</a>
+                    <a href="{{ path('pokedex', {generation: current_generation, type: current_type, q: current_search, limit: current_limit, page: currentPage - 1}) }}">‹ Précédente</a>
+                {% endif %}
+
+                {% for i in max(1, currentPage - 2)..min(totalPages, currentPage + 2) %}
+                    {% if i == currentPage %}
+                        <span class="current">{{ i }}</span>
+                    {% else %}
+                        <a href="{{ path('pokedex', {generation: current_generation, type: current_type, q: current_search, limit: current_limit, page: i}) }}">{{ i }}</a>
+                    {% endif %}
+                {% endfor %}
+
+                {% if currentPage < totalPages %}
+                    <a href="{{ path('pokedex', {generation: current_generation, type: current_type, q: current_search, limit: current_limit, page: currentPage + 1}) }}">Suivante ›</a>
+                    <a href="{{ path('pokedex', {generation: current_generation, type: current_type, q: current_search, limit: current_limit, page: totalPages}) }}">Dernière »</a>
+                {% endif %}
+            </div>
+        {% endif %}
+    {% else %}
+        <div class="pagination-info">
+            Affichage de tous les {{ totalPokemons }} Pokémon
+        </div>
+    {% endif %}
+</div>
+
+<script>
+function changeLimit(limit) {
+    const url = new URL(window.location);
+    url.searchParams.set('limit', limit);
+    url.searchParams.set('page', '1');
+    window.location.href = url.toString();
+}
+</script>
+{% endblock %}

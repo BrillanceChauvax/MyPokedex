@@ -56,43 +56,58 @@ class PokemonRepository extends ServiceEntityRepository
     }
     public function filterAllWithPagination($generation, $type, $search, $limit, $page): array
     {
-        $qb = $this->createQueryBuilder('p')
-            ->leftJoin('p.types', 'pt')
-            ->leftJoin('pt.type', 't')
-            ->leftJoin('p.evolutionsDepuis', 'ev')
-            ->leftJoin('ev.pokemonFin', 'pf')
-            ->addSelect('pt', 't', 'ev', 'pf');
-
+        $qbIds = $this->createQueryBuilder('p')
+            ->select('DISTINCT p.id');
+        
         if ($generation) {
-            $qb->andWhere('p.generation = :gen')->setParameter('gen', $generation);
+            $qbIds->andWhere('p.generation = :gen')->setParameter('gen', $generation);
         }
+        
         if ($type) {
-            $qb->andWhere('t.id = :type')->setParameter('type', $type);
+            $qbIds->andWhere('EXISTS (
+                SELECT 1 FROM App\Entity\PokemonType pt2 
+                JOIN App\Entity\Type t2 WITH pt2.type = t2.id 
+                WHERE pt2.pokemon = p.id AND t2.id = :type
+            )')->setParameter('type', $type);
         }
+        
         if ($search) {
-            $qb
-                ->andWhere('p.nom LIKE :search OR p.numero_national = :num')
+            $qbIds->andWhere('p.nom LIKE :search OR p.numero_national = :num')
                 ->setParameter('search', '%' . $search . '%')
                 ->setParameter('num', is_numeric($search) ? (int)$search : -1);
         }
-
-        $qb->orderBy('p.numero_national', 'ASC');
         
-        // Compter le total sans limitation
-        $countQb = clone $qb;
-        $total = $countQb->select('COUNT(DISTINCT p.id)')->getQuery()->getSingleScalarResult();
+        $qbIds->orderBy('p.numero_national', 'ASC');
         
-        // Si limit n'est pas "all", appliquer la pagination
+        $countQb = clone $qbIds;
+        $total = count($countQb->getQuery()->getScalarResult());
+        
         if ($limit !== 'all') {
             $offset = ((int)$limit) * ($page - 1);
-            $qb->setFirstResult($offset)->setMaxResults((int)$limit);
+            $qbIds->setFirstResult($offset)->setMaxResults((int)$limit);
             $totalPages = ceil($total / (int)$limit);
         } else {
             $totalPages = 1;
         }
-
-        $pokemons = $qb->getQuery()->getResult();
-
+        
+        $pokemonIds = array_column($qbIds->getQuery()->getScalarResult(), 'id');
+        
+        if (empty($pokemonIds)) {
+            return ['pokemons' => [], 'total' => $total, 'totalPages' => $totalPages];
+        }
+        
+        $qbComplete = $this->createQueryBuilder('p')
+            ->leftJoin('p.types', 'pt')
+            ->leftJoin('pt.type', 't')
+            ->leftJoin('p.evolutionsDepuis', 'ev')
+            ->leftJoin('ev.pokemonFin', 'pf')
+            ->addSelect('pt', 't', 'ev', 'pf')
+            ->where('p.id IN (:ids)')
+            ->setParameter('ids', $pokemonIds)
+            ->orderBy('p.numero_national', 'ASC');
+        
+        $pokemons = $qbComplete->getQuery()->getResult();
+        
         return [
             'pokemons' => $pokemons,
             'total' => $total,

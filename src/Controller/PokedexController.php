@@ -18,11 +18,17 @@ class PokedexController extends AbstractController
         $search = $request->query->get('q');
         $limit = $request->query->get('limit', 25); 
         $page = $request->query->get('page', 1); 
+        $sort = $request->query->get('sort', 'numero');
+        $order = $request->query->get('order', 'asc');
         
+        $allowedSorts = ['generation', 'numero', 'nom'];
+        $sort = in_array($sort, $allowedSorts) ? $sort : 'numero';
+        $order = in_array($order, ['asc', 'desc']) ? $order : 'asc';
+
         $limit = in_array($limit, [25, 50, 75, 100, 'all']) ? $limit : 25;
         $page = max(1, (int)$page);
         
-        $result = $pokemonRepository->filterAllWithPagination($generation, $type, $search, $limit, $page);
+        $result = $pokemonRepository->filterAllWithPagination($generation, $type, $search, $limit, $page, $sort, $order);
         $generations = $pokemonRepository->findAllGenerations();
         $types = $typeRepository->findAll();
 
@@ -36,7 +42,9 @@ class PokedexController extends AbstractController
             'current_generation' => $generation,
             'current_type' => $type,
             'current_search' => $search,
-            'current_limit' => $limit,               
+            'current_limit' => $limit,    
+            'sort' => $sort,
+            'order' => $order,           
         ]);
     }
 }

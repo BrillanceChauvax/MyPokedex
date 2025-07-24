@@ -17,10 +17,15 @@
         vertical-align: middle;
         height: 40px; 
         position: relative;
+        font-size: 20px;
     }
     table.pokedex th {
-        background-color: #a7dffdff;
+        background-color: #ffffffff;
         font-weight: bold;
+        padding: 10px 8px;
+        position: relative;
+        vertical-align: middle;
+        text-align: center;
     }
     .type-cell {
         min-width: 60px;
@@ -138,6 +143,53 @@
     .pagination-nav .disabled {
         opacity: 0.5;
         pointer-events: none;
+    }
+    /* Styles pour les liens de tri */
+    .sort-link {
+        color: #333;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+        padding: 8px;
+        transition: background-color 0.2s;
+        box-sizing: border-box;
+        gap: 6px;
+    }
+
+    .sort-link:hover {
+        background-color: rgba(255, 255, 255, 0.3);
+        color: #000;
+    }
+
+    .sort-arrows {
+        display: flex;
+        flex-direction: column;
+        line-height: 1;
+        margin-left: 4px;
+    }
+    /* Style par défaut des flèches (inactives) */
+    .sort-arrows .arrow {
+        font-size: 10px;
+        color: #ccc;
+        transition: color 0.2s;
+    }
+
+    /* Flèche active (surbrillance) */
+    .sort-arrows .arrow.active {
+        color: #2381c9;
+        font-weight: bold;
+    }
+
+    /* Au survol, toutes les flèches deviennent plus visibles */
+    .sort-link:hover .sort-arrows .arrow {
+        color: #999;
+    }
+
+    .sort-link:hover .sort-arrows .arrow.active {
+        color: #1a5a8a;
     }
     @media (min-width: 901px) {
         .navbar-pokedex {
@@ -281,10 +333,46 @@
 <table class="pokedex">
     <thead>
         <tr>
-            <th>Génération</th>
-            <th>N°</th>
+            <th class="sortable">
+                <a href="{{ path('pokedex', app.request.query.all|merge({
+                    'sort': 'generation', 
+                    'order': order == 'asc' and sort == 'generation' ? 'desc' : 'asc', 
+                    'page': 1
+                    })) }}" class="sort-link">
+                        Génération
+                    <span class="sort-arrows">
+                        <span class="arrow {{ (sort == 'generation' and order == 'asc') ? 'active' : '' }}">▲</span>
+                        <span class="arrow {{ (sort == 'generation' and order == 'desc') ? 'active' : '' }}">▼</span>
+                    </span>
+                </a>
+            </th>
+           <th class="sortable">
+                <a href="{{ path('pokedex', app.request.query.all|merge({
+                    'sort': 'numero', 
+                    'order': order == 'asc' and sort == 'numero' ? 'desc' : 'asc', 
+                    'page': 1
+                    })) }}" class="sort-link">
+                        N°
+                    <span class="sort-arrows">
+                        <span class="arrow {{ (sort == 'numero' and order == 'asc') ? 'active' : '' }}">▲</span>
+                        <span class="arrow {{ (sort == 'numero' and order == 'desc') ? 'active' : '' }}">▼</span>
+                    </span>
+                </a>
+            </th>
             <th>Image</th>
-            <th>Nom</th>
+            <th class="sortable">
+                <a href="{{ path('pokedex', app.request.query.all|merge({
+                    'sort': 'nom', 
+                    'order': order == 'asc' and sort == 'nom' ? 'desc' : 'asc', 
+                    'page': 1
+                    })) }}" class="sort-link">
+                        Nom
+                    <span class="sort-arrows">
+                        <span class="arrow {{ (sort == 'nom' and order == 'asc') ? 'active' : '' }}">▲</span>
+                        <span class="arrow {{ (sort == 'nom' and order == 'desc') ? 'active' : '' }}">▼</span>
+                    </span>
+                </a>
+            </th>
             <th>Types</th>
             <th>Évolution</th>
         </tr>
@@ -356,21 +444,61 @@
         {% if totalPages > 1 %}
             <div class="pagination-nav">
                 {% if currentPage > 1 %}
-                    <a href="{{ path('pokedex', {generation: current_generation, type: current_type, q: current_search, limit: current_limit, page: 1}) }}">« Première</a>
-                    <a href="{{ path('pokedex', {generation: current_generation, type: current_type, q: current_search, limit: current_limit, page: currentPage - 1}) }}">‹ Précédente</a>
+                    <a href="{{ path('pokedex', {
+                        generation: current_generation, 
+                        type: current_type, 
+                        q: current_search, 
+                        limit: current_limit, 
+                        sort: sort, 
+                        order: order, 
+                        page: 1
+                    }) }}">« Première</a>
+                    <a href="{{ path('pokedex', {
+                        generation: current_generation, 
+                        type: current_type, 
+                        q: current_search, 
+                        limit: current_limit, 
+                        sort: sort, 
+                        order: order, 
+                        page: currentPage - 1
+                    }) }}">‹ Précédente</a>
                 {% endif %}
 
                 {% for i in max(1, currentPage - 2)..min(totalPages, currentPage + 2) %}
                     {% if i == currentPage %}
                         <span class="current">{{ i }}</span>
                     {% else %}
-                        <a href="{{ path('pokedex', {generation: current_generation, type: current_type, q: current_search, limit: current_limit, page: i}) }}">{{ i }}</a>
+                        <a href="{{ path('pokedex', {
+                            generation: current_generation, 
+                            type: current_type, 
+                            q: current_search, 
+                            limit: current_limit, 
+                            sort: sort, 
+                            order: order, 
+                            page: i
+                        }) }}">{{ i }}</a>
                     {% endif %}
                 {% endfor %}
 
                 {% if currentPage < totalPages %}
-                    <a href="{{ path('pokedex', {generation: current_generation, type: current_type, q: current_search, limit: current_limit, page: currentPage + 1}) }}">Suivante ›</a>
-                    <a href="{{ path('pokedex', {generation: current_generation, type: current_type, q: current_search, limit: current_limit, page: totalPages}) }}">Dernière »</a>
+                    <a href="{{ path('pokedex', {
+                        generation: current_generation, 
+                        type: current_type, 
+                        q: current_search, 
+                        limit: current_limit, 
+                        sort: sort, 
+                        order: order, 
+                        page: currentPage + 1
+                    }) }}">Suivante ›</a>
+                    <a href="{{ path('pokedex', {
+                        generation: current_generation, 
+                        type: current_type, 
+                        q: current_search, 
+                        limit: current_limit, 
+                        sort: sort, 
+                        order: order, 
+                        page: totalPages
+                    }) }}">Dernière »</a>
                 {% endif %}
             </div>
         {% endif %}
@@ -386,6 +514,7 @@ function changeLimit(limit) {
     const url = new URL(window.location);
     url.searchParams.set('limit', limit);
     url.searchParams.set('page', '1');
+    // Conserver les paramètres de tri existants
     window.location.href = url.toString();
 }
 </script>

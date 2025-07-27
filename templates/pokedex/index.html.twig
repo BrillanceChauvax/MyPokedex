@@ -1,5 +1,10 @@
 {% extends 'base.html.twig' %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    <link href="{{ asset('css/pokemon-popup.css') }}" rel="stylesheet">
+{% endblock %}
+
 {% block body %}
 <style>
     body {
@@ -144,7 +149,7 @@
         opacity: 0.5;
         pointer-events: none;
     }
-    /* Styles pour les liens de tri */
+
     .sort-link {
         color: #333;
         text-decoration: none;
@@ -170,20 +175,18 @@
         line-height: 1;
         margin-left: 4px;
     }
-    /* Style par défaut des flèches (inactives) */
+
     .sort-arrows .arrow {
         font-size: 10px;
         color: #ccc;
         transition: color 0.2s;
     }
 
-    /* Flèche active (surbrillance) */
     .sort-arrows .arrow.active {
         color: #2381c9;
         font-weight: bold;
     }
 
-    /* Au survol, toutes les flèches deviennent plus visibles */
     .sort-link:hover .sort-arrows .arrow {
         color: #999;
     }
@@ -247,13 +250,19 @@
         }
         .mobile-toggle {
             display: block;
-            color: white;
+            color: black;
             font-weight: bold;
-            border: 1px solid #fff;
+            border: 1px solid black;
             background: transparent;
             padding: 0.4em 0.8em;
             border-radius: 6px;
             cursor: pointer;
+        }
+        .mobile-toggle:hover {
+            background-color: #fff;
+            border-color: #000;
+            transform: scale(1.1);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
         }
     }
     .form-pokedex-filters select,
@@ -379,7 +388,7 @@
     </thead>
     <tbody>
         {% for p in pokemons %}
-            <tr>
+            <tr data-pokemon-id="{{ p.id }}">
                 <td>{{ p.generation }}</td>
                 <td>{{ p.numeroNational }}</td>
                 <td>
@@ -509,13 +518,19 @@
     {% endif %}
 </div>
 
-<script>
-function changeLimit(limit) {
-    const url = new URL(window.location);
-    url.searchParams.set('limit', limit);
-    url.searchParams.set('page', '1');
-    // Conserver les paramètres de tri existants
-    window.location.href = url.toString();
-}
-</script>
+{% include 'pokedex/popup.html.twig' %}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('js/pokemon-popup.js') }}"></script>
+
+    <script>
+    function changeLimit(limit) {
+        const url = new URL(window.location);
+        url.searchParams.set('limit', limit);
+        url.searchParams.set('page', '1');
+        window.location.href = url.toString();
+    }
+    </script>
 {% endblock %}

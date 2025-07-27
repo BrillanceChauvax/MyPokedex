@@ -1,0 +1,34 @@
+<div id="pokemon-popup-overlay" class="popup-overlay" style="display: none;">
+    <div class="popup-container">
+        <button class="popup-close" onclick="closePokemonPopup()">&times;</button>
+        <div class="popup-content">
+            
+            <div class="popup-body">
+                <div class="pokemon-main-info">
+                    <div class="pokemon-image">
+                        <img id="popup-pokemon-image" src="" alt="Pokémon" />
+                    </div>
+                    
+                    <div class="pokemon-details">
+                        <h2 id="popup-pokemon-name"></h2>
+                        <div class="pokemon-meta">
+                            <span class="generation">Génération <span id="popup-pokemon-generation"></span></span>
+                            <span class="pokedex-number">#<span id="popup-pokemon-number"></span></span>
+                        </div>
+                        
+                        <div class="pokemon-types" id="popup-pokemon-types">
+                            <!-- Types seront ajoutés dynamiquement -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="evolution-section" id="evolution-section" style="display: none;">
+                    <h3>Chaîne d'évolution</h3>
+                    <div class="evolution-chain" id="evolution-chain">
+                        <!-- Chaîne d'évolution sera ajoutée dynamiquement -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

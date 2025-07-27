@@ -48,7 +48,7 @@
         justify-content: center; 
         width: 100%;
         max-width: 100px;
-        height: 200px;
+        height: 100px;
         object-fit: contain;
         margin: 0 auto;
     }
@@ -61,8 +61,9 @@
         margin: 2px auto;
     }
     .evolution-cell {
-        min-width: 120px;
+        max-width: 100px;
         padding: 8px;
+        object-fit: contain;
     }
     .evolution-content {
         display: flex;
@@ -71,9 +72,12 @@
         gap: 4px;
     }
     .evolution-sprite {
+        display: flex;
         width: 50px;
         height: 50px;
         object-fit: contain;
+        max-width: 100px;
+        
     }
     .evolution-condition {
         font-size: 0.8em;
@@ -320,9 +324,18 @@
 
     <form method="get" class="form-pokedex-filters">
         <select name="generation" onchange="this.form.submit()">
-            <option value="">Toutes générations</option>
+            <option value="">Toutes les générations</option>
             {% for gen in generations %}
-                <option value="{{ gen }}" {% if gen == current_generation %}selected{% endif %}>Génération {{ gen }}</option>
+                <option value="{{ gen }}" 
+                        {% if current_generation is not empty and current_generation == gen %}selected="selected"{% endif %}>
+                    {% if gen == 98 %}
+                        MÉGA-ÉVOLUTION
+                    {% elseif gen == 99 %}
+                        GIGAMAX
+                    {% else %}
+                        Génération {{ gen }}
+                    {% endif %}
+                </option>
             {% endfor %}
         </select>
         
@@ -389,7 +402,15 @@
     <tbody>
         {% for p in pokemons %}
             <tr data-pokemon-id="{{ p.id }}">
-                <td>{{ p.generation }}</td>
+                <td>
+                    {% if p.generation == 98 %}
+                        MÉGA-ÉVOLUTION
+                    {% elseif p.generation == 99 %}
+                        GIGAMAX
+                    {% else %}
+                        {{ p.generation }}
+                    {% endif %}
+                </td>
                 <td>{{ p.numeroNational }}</td>
                 <td>
                     <img
@@ -412,14 +433,16 @@
                     {% if evolutions|length > 0 %}
                         {% for ev in evolutions %}
                             <div class="evolution-content">
-                                <img 
-                                    src="{{ ev.pokemonFin.imageUrl }}" 
-                                    alt="{{ ev.pokemonFin.nom }}" 
-                                    class="evolution-sprite"
-                                    onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/0.png';"
-                                >
-                                <div class="evolution-name">{{ ev.pokemonFin.nom }}</div>
-                                <div class="evolution-condition">{{ ev.condition }}</div>
+                                {% if ev.pokemonFin.imageUrl %}
+                                    <img class="pokemon-image"
+                                        src="{{ ev.pokemonFin.imageUrl }}" 
+                                        alt="{{ ev.pokemonFin.nom }}" 
+                                        onerror="this.style.display='none'">
+                                {% endif %}
+                                <span>{{ ev.pokemonFin.nom }}</span>
+                                {% if ev.condition %}
+                                    <span>({{ ev.condition }})</span>
+                                {% endif %}
                             </div>
                         {% endfor %}
                     {% else %}

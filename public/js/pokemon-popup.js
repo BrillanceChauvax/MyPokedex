@@ -92,10 +92,20 @@ function showErrorMessage(message) {
 function displayPokemonPopup(pokemon) {
     restorePopupContent();
     
+    // Affichage conditionnel de la génération
+    const generationElement = document.getElementById('popup-pokemon-generation');
+    if (pokemon.generation === 99) {
+        generationElement.textContent = 'GIGAMAX';
+    } else if (pokemon.generation === 98) {
+        generationElement.textContent = 'MÉGA-ÉVOLUTION';
+    } else {
+        generationElement.textContent = pokemon.generation;
+    }
+
+
     document.getElementById('popup-pokemon-image').src = pokemon.image_url || '/images/pokemon-placeholder.png';
     document.getElementById('popup-pokemon-image').alt = pokemon.nom;
     document.getElementById('popup-pokemon-name').textContent = pokemon.nom;
-    document.getElementById('popup-pokemon-generation').textContent = pokemon.generation;
     document.getElementById('popup-pokemon-number').textContent = pokemon.numero_national.toString().padStart(3, '0');
 
     displayPokemonTypes(pokemon.types);

@@ -102,6 +102,12 @@ function displayPokemonPopup(pokemon) {
         generationElement.textContent = pokemon.generation;
     }
 
+    const pokedexNumberElement = document.querySelector('.pokedex-number');
+    if (pokemon.generation === 98 || pokemon.generation === 99) {
+        pokedexNumberElement.style.display = 'none';
+    } else {
+        pokedexNumberElement.style.display = 'inline';
+    }
 
     document.getElementById('popup-pokemon-image').src = pokemon.image_url || '/images/pokemon-placeholder.png';
     document.getElementById('popup-pokemon-image').alt = pokemon.nom;

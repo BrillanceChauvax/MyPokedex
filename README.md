@@ -1,27 +1,27 @@
-Pokédex Symfony
-Bienvenue sur le repository de Pokédex Symfony, un projet complet de Pokédex web respectant la structure des jeux vidéo Pokémon : consultation avancée, stats détaillées, talents et évolutions, en version responsive et moderne.
+# Pokédex Symfony
 
-✨ Présentation
-Ce projet a pour but de fournir une base de données exhaustive et interactive sur les Pokémon, développée avec Symfony et pensée pour être facilement étendue.
-Il met en avant :
+Bienvenue sur le repository de **Pokédex Symfony**, un projet complet de Pokédex web respectant la structure des jeux vidéos Pokémon : consultation avancée, stats détaillées, talents et évolutions, en version responsive et moderne.
 
-Toutes les informations officielles (stats, tailles, descriptions…)
+## ✨ Présentation
 
-La gestion des talents avec différenciation du talent caché
+Ce projet a pour but de fournir une base de données exhaustive et interactive sur les Pokémon, développée avec Symfony et pensée pour être facilement étendue.  
+Il met en avant :
 
-L’affichage en popup responsive, moderne et illustré
+- Toutes les informations officielles (stats, tailles, descriptions…)
+- La gestion des talents avec différenciation du talent caché
+- L’affichage en popup responsive, moderne et illustré
+- Un back-end API prêt à l’emploi (édition par SQL pour l’instant)
+- Une ergonomie "mobile first", totalement adaptée aux écrans PC ou tablette
 
-Un back-end API prêt à l’emploi (édition par SQL)
+## 🗃️ Structure technique
 
-Une ergonomie "mobile first", totalement adaptée aux écrans PC ou tablette
-
-🗃️ Structure technique
 Le projet suit les meilleures pratiques Symfony et utilise une modélisation des données relationnelle claire, fidèle à la logique du Pokédex.
 
-📦 Arborescence principale :
+### 📦 Arborescence principale :
+
+```
 text
 /assets
-    /images
     MPD.png    # <-- Modèle Physique des Données (voir ci-dessous)
 /public
     /css
@@ -32,61 +32,69 @@ text
     /repository
 /templates
     /pokedex
-...
-🗺️ Modèle Physique des Données (MPD)
-Le schéma relationnel du projet (MPD) détaille toutes les entités, leurs attributs et relations :
+```
 
-<p align="center"> <img src="assets/MPD.png" alt="Modèle Physique des Données Pokédex" width="600"/> </p>
+## 🗺️ Modèle Physique des Données (MPD)
+
+Le schéma relationnel du projet (MPD) détaille toutes les entités, leurs attributs et relations :
+
+![Modèle Physique des Données Pokédex](assets/MPD.png)
+
 Les entités principales :
 
-POKEMON : toutes les infos et statistiques propres à une créature
+- **POKEMON** : toutes les infos et statistiques propres à une créature  
+- **TALENT** : un référentiel unique de tous les talents existants dans Pokémon  
+- **POKEMON_TALENT** : la table de liaison, permettant d’indiquer si le talent est caché (`is_hidden`)  
+- **TYPE**, **POKEMON_TYPE**, **EVOLUTION** : relations ManyToMany pour gérer types et évolutions
 
-TALENT : un référentiel unique de tous les talents existants dans Pokémon
+> Le MPD complet est consultable dans le dossier `/assets/MPD.png` du repository.  
+> Il a été généré à partir de code Mermaid / DB diagram.
 
-POKEMON_TALENT : la table de liaison, permettant d’indiquer si le talent est caché (is_hidden)
+## 🚀 Déploiement local
 
-TYPE, POKEMON_TYPE, EVOLUTION : relations ManyToMany pour gérer types et évolutions
+1. **Cloner le dépôt** :
 
-Le MPD complet est consultable dans le dossier /assets/MPD.png du repository.
-Il a été généré à partir du code Mermaid/DB diagram fourni dans le projet.
-
-🚀 Déploiement local
-Cloner le dépôt :
-
-bash
+```
 git clone https://github.com/tonuser/pokedex-symfony.git
 cd pokedex-symfony
-Installer les dépendances :
+```
 
-bash
+2. **Installer les dépendances** :
+
+```
 composer install
 yarn install    # ou npm install
-Configurer l’environnement – ex :
+```
 
-bash
+3. **Configurer l’environnement** – par exemple :
+
+```
 cp .env .env.local
 Modifiez les variables de connexion à la base de données dans .env.local.
+```
 
-Créer les tables et charger les données :
+4. **Créer les tables et charger les données :**
 
-Générer la base :
+- Générer la base de données :
 
-bash
+```
 php bin/console doctrine:schema:update --force
-Charger le MPD (MPD.png, .mmd) dans votre outil favori si besoin pour consulter le modèle.
+```
+Charger le MPD (MPD.png) dans votre outil favori si besoin pour consulter le modèle.
 
-Démarrer l’application via Symfony Server ou Apache/Nginx.
+5. **Démarrer l’application** via Symfony Server ou Apache/Nginx.
 
-🖼️ Capture d’écran
-<p align="center"> <img src="assets/capture-ecran-pokedex.png" alt="Capture d'écran du Pokédex" width="600"/> </p>
+## 🖼️ Capture d’écran
 
-🤖 Attributions
-Schéma MPD généré avec Mermaid Live Editor et converti en PNG.
+![Capture d'écran du Pokédex](assets/Capture-ecran-pokedex.png)
 
-Données officielles issues de Poképédia, PokéAPI, ainsi que la base de données officielle de The Pokémon Company.
+## 🤖 Attributions
+- Schéma MPD généré avec Mermaid Live Editor et converti en PNG.
 
-📝 Notes
+- Données officielles issues de Poképédia, PokéAPI, ainsi que la base de données officielle de The Pokémon Company.
 
-Pour toute question sur le schéma MPD, se référer au fichier /assets/MPD.png.
+## 📝 Notes
 
-Modification des données Pokémon/Talents : directement en SQL (script d'insertion de tous les talents disponible dans /assets/Script SQL d'insertion de talents Pokémon.txt).
+- Pour toute question sur le schéma MPD, se référer au fichier /assets/MPD.png.
+
+- Modification des données Pokémon/Talents : directement en SQL (script d'insertion de tous les talents disponible dans /assets/Script SQL d'insertion de talents Pokémon.txt).

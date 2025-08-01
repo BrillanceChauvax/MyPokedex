@@ -7,6 +7,7 @@ use App\Repository\EvolutionRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
+use App\Entity\PokemonTalent;
 
 class PokemonApiController extends AbstractController
 {
@@ -32,7 +33,26 @@ class PokemonApiController extends AbstractController
             'generation' => $pokemon->getGeneration(),
             'image_url' => $pokemon->getImageUrl(),
             'types' => [],
-            'evolution_chain' => $evolutionChain
+            'evolution_chain' => $evolutionChain,
+            'taille' => $pokemon->getTaille(),
+            'poids' => $pokemon->getPoids(),
+            'cri_url' => $pokemon->getCriUrl(),
+            'description' => $pokemon->getDescription(),
+            'stats' => [
+            'pv' => $pokemon->getPv(),
+            'attaque' => $pokemon->getAttaque(),
+            'attaque_spe' => $pokemon->getAttaqueSpe(),
+            'defense' => $pokemon->getDefense(),
+            'defense_spe' => $pokemon->getDefenseSpe(),
+            'vitesse' => $pokemon->getVitesse(),
+            ],
+            'talents' => array_map(function(PokemonTalent $pt) {
+                return [
+                    'nom' => $pt->getTalent()->getNom(),
+                    'description' => $pt->getTalent()->getDescription(),
+                    'is_hidden' => $pt->isHidden(),
+                ];
+            }, $pokemon->getPokemonTalent()->toArray()),
         ];
 
         // Récupération des types via la relation PokemonType

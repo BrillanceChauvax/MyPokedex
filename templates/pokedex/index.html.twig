@@ -433,13 +433,15 @@
                     {% if evolutions|length > 0 %}
                         {% for ev in evolutions %}
                             <div class="evolution-content">
-                                {% if ev.pokemonFin.imageUrl %}
+                                {% if ev.pokemonFin and ev.pokemonFin.imageUrl %}
                                     <img class="pokemon-image"
                                         src="{{ ev.pokemonFin.imageUrl }}" 
                                         alt="{{ ev.pokemonFin.nom }}" 
                                         onerror="this.style.display='none'">
                                 {% endif %}
-                                <span>{{ ev.pokemonFin.nom }}</span>
+                                {% if ev.pokemonFin %}
+                                    <span>{{ ev.pokemonFin.nom }}</span>
+                                {% endif %}
                                 {% if ev.condition %}
                                     <span>({{ ev.condition }})</span>
                                 {% endif %}

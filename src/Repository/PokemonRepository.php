@@ -26,9 +26,11 @@ class PokemonRepository extends ServiceEntityRepository
         $qb = $this->createQueryBuilder('p')
             ->leftJoin('p.types', 'pt')
             ->leftJoin('pt.type', 't')
+            ->leftJoin('p.pokemonTalent', 'poktal')  
+            ->leftJoin('poktal.talent', 'tal')
             ->leftJoin('p.evolutionsDepuis', 'ev')
             ->leftJoin('ev.pokemonFin', 'pf')
-            ->addSelect('pt', 't', 'ev', 'pf');
+            ->addSelect('pt', 't', 'poktal', 'tal', 'ev', 'pf');
 
         if ($generation) {
             $qb->andWhere('p.generation = :gen')->setParameter('gen', $generation);
@@ -64,6 +66,12 @@ class PokemonRepository extends ServiceEntityRepository
         $qbIds = $this->createQueryBuilder('p')
             ->select('DISTINCT p.id');
         
+        if ($sort === 'talents') {
+            $qbIds->leftJoin('p.pokemonTalent', 'pt_talent')
+                ->leftJoin('pt_talent.talent', 't_talent')
+                ->addSelect('t_talent.nom');
+        }
+        
         if ($generation) {
             $qbIds->andWhere('p.generation = :gen')->setParameter('gen', $generation);
         }
@@ -92,6 +100,10 @@ class PokemonRepository extends ServiceEntityRepository
             case 'nom':
                 $qbIds->orderBy('p.nom', $order);
                 break;
+            case 'talents':  
+                $qbIds->addOrderBy('t_talent.nom', $order)
+                       ->addOrderBy('p.nom', 'ASC');
+            break;
             default:
                 $qbIds->orderBy('p.numero_national', $order);
         }
@@ -121,9 +133,11 @@ class PokemonRepository extends ServiceEntityRepository
         $qbComplete = $this->createQueryBuilder('p')
             ->leftJoin('p.types', 'pt')
             ->leftJoin('pt.type', 't')
+            ->leftJoin('p.pokemonTalent', 'poktal')  
+            ->leftJoin('poktal.talent', 'tal')      
             ->leftJoin('p.evolutionsDepuis', 'ev')
             ->leftJoin('ev.pokemonFin', 'pf')
-            ->addSelect('pt', 't', 'ev', 'pf')
+            ->addSelect('pt', 't', 'poktal', 'tal', 'ev', 'pf')
             ->where('p.id IN (:ids)')
             ->setParameter('ids', $pokemonIds);
         
@@ -136,6 +150,9 @@ class PokemonRepository extends ServiceEntityRepository
                 break;
             case 'nom':
                 $qbComplete->orderBy('p.nom', $order);
+                break;
+            case 'talents':  
+                $qbComplete->orderBy('tal.nom', $order);
                 break;
             default:
                 $qbComplete->orderBy('p.numero_national', $order);

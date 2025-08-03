@@ -198,6 +198,26 @@
     .sort-link:hover .sort-arrows .arrow.active {
         color: #1a5a8a;
     }
+
+    .talents-cell {
+        min-width: 120px;
+        max-width: 180px;
+    }
+
+    .talent-badge {
+        display: inline-block;
+        background-color: #6c757d;
+        color: white;
+        padding: 2px 6px;
+        border-radius: 10px;
+        font-size: 1rem;
+        margin: 1px;
+    }
+
+    .talent-cache {
+        background-color: #6c757d;
+    }
+
     @media (min-width: 901px) {
         .navbar-pokedex {
             display: flex;
@@ -304,6 +324,19 @@
             font-size: 0.93em; 
         }
     }
+    @media (max-width: 768px) {
+    /* Masquer les en-têtes */
+    th:nth-child(1), /* Colonne Génération */
+    th:nth-child(6) { /* Colonne Talents */
+        display: none;
+    }
+    
+    /* Masquer les cellules correspondantes */
+    td:nth-child(1), /* Cellules Génération */
+    td:nth-child(6) { /* Cellules Talents */
+        display: none;
+    }
+}
 </style>
 
 <nav class="navbar-pokedex">
@@ -396,6 +429,19 @@
                 </a>
             </th>
             <th>Types</th>
+            <th class="sortable">
+                <a href="{{ path('pokedex', app.request.query.all|merge({
+                    'sort': 'talents', 
+                    'order': order == 'asc' and sort == 'talents' ? 'desc' : 'asc', 
+                    'page': 1
+                    })) }}" class="sort-link">
+                        Talents
+                    <span class="sort-arrows">
+                        <span class="arrow {{ (sort == 'talents' and order == 'asc') ? 'active' : '' }}">▲</span>
+                        <span class="arrow {{ (sort == 'talents' and order == 'desc') ? 'active' : '' }}">▼</span>
+                    </span>
+                </a>
+            </th>
             <th>Évolution</th>
         </tr>
     </thead>
@@ -427,6 +473,21 @@
                         <img src="{{ pt.type.iconeUrl }}" alt="{{ pt.type.nom }}" title="{{ pt.type.nom }}" class="type-icon">
                     {% endfor %}
                     </span>
+                </td>
+                <td class="talents-cell">
+                    {% set talents = p.pokemonTalent|default([]) %}
+                    {% if talents|length > 0 %}
+                        {% for pokemonTalent in talents %}
+                            <span class="talent-badge{% if pokemonTalent.isHidden %} talent-cache{% endif %}" 
+                                  title="{{ pokemonTalent.talent.description|default('') }}">
+                                {{ pokemonTalent.talent.nom }}
+                                {% if pokemonTalent.isHidden %} (caché){% endif %}
+                            </span>
+                            {% if not loop.last %}<br>{% endif %}
+                        {% endfor %}
+                    {% else %}
+                        <span class="text-muted">-</span>
+                    {% endif %}
                 </td>
                 <td class="evolution-cell">
                     {% set evolutions = p.evolutionsDepuis|default([]) %}

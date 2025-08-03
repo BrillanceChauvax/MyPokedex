@@ -21,7 +21,7 @@ class PokedexController extends AbstractController
         $sort = $request->query->get('sort', 'numero');
         $order = $request->query->get('order', 'asc');
         
-        $allowedSorts = ['generation', 'numero', 'nom'];
+        $allowedSorts = ['generation', 'numero', 'nom', 'talents'];
         $sort = in_array($sort, $allowedSorts) ? $sort : 'numero';
         $order = in_array($order, ['asc', 'desc']) ? $order : 'asc';
 

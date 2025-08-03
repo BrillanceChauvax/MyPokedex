@@ -60,6 +60,15 @@ function showErrorMessage(message) {
 }
 
 function displayPokemonPopup(pokemon) {
+
+    // Retour en haut de la popup au changement de Pokémon
+    const popupBody = document.querySelector('.popup-body');
+    if (popupBody) {
+        popupBody.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    }
     
     // Affichage conditionnel de la génération
     const generationElement = document.getElementById('popup-pokemon-generation');
